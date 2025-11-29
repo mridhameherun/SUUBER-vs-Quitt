@@ -2,14 +2,14 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cost calculator SUUBER vs Quitt</title>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Markdown Parser -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
+    <!-- Markdown Parser (still loaded, but not required for calculator) -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <style>
@@ -59,7 +59,6 @@
         .panel-right {
             padding: 2rem;
             width: 100%;
-            background-color: var(--color-panel-right);
             border-left: 1px solid #CFFAFE;
             display: flex;
             flex-direction: column;
@@ -78,24 +77,10 @@
         }
 
         /* --- Typography --- */
-        .h1 {
-            font-size: 80px;
-            font-weight: 500;
-            margin: 0 0 0.5rem 0;
-            color: var(--color-text-main);
-        }
-
         .h2 {
             font-size: 40px;
             font-weight: 600;
             margin: 0 0 2rem 0;
-            color: var(--color-text-main);
-        }
-
-        .h3 {
-            font-size: 30px;
-            font-weight: 600;
-            margin: 0 0 1.25rem 0;
             color: var(--color-text-main);
         }
 
@@ -111,54 +96,12 @@
             margin: 0;
         }
 
-        .text-sm {
-            font-size: 0.875rem;
-        }
-
-        .text-xs {
-            font-size: 0.75rem;
-        }
-
         .text-muted {
             color: var(--color-text-muted);
         }
 
-        .font-medium {
-            font-weight: 500;
-        }
-
-        .font-bold {
-            font-weight: 700;
-        }
-
-        .mt-4 {
-            margin-top: 1rem;
-        }
-
-        .mb-2 {
-            margin-bottom: 0.5rem;
-        }
-
-        /* --- Input Grid --- */
-        .input-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 2rem;
-            margin-top: 2.5rem;
-        }
-
-        @media (min-width: 768px) {
-            .input-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 3rem;
-            }
-        }
-
         /* --- Sliders --- */
-        /* --- Slider Component --- */
-        .slider-container {
-            position: relative;
-            padding-top: 1.5rem;
+        .slider-group {
             margin-bottom: 2rem;
         }
 
@@ -176,15 +119,6 @@
             display: flex;
             align-items: center;
             margin-top: 40px;
-        }
-
-        #slider-track-bg {
-            position: absolute;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background-color: #ffffff;
-            border-radius: 999px;
         }
 
         .slider-fill {
@@ -212,6 +146,7 @@
             white-space: nowrap;
         }
 
+        /* Native Slider Styling */
         input[type="range"] {
             -webkit-appearance: none;
             -moz-appearance: none;
@@ -225,10 +160,7 @@
             z-index: 2;
         }
 
-        input[type=range]:focus {
-            outline: none;
-        }
-
+        /* Slider Thumb */
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
@@ -240,8 +172,8 @@
         }
 
         input[type="range"]::-moz-range-thumb {
-            width: 40px;
-            height: 40px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             background: #009ce0;
             cursor: pointer;
@@ -261,10 +193,6 @@
             display: flex;
             flex-direction: column;
             gap: 0.75rem;
-        }
-
-        .radio-label:hover span {
-            color: var(--color-text-main);
         }
 
         .radio-label {
@@ -354,6 +282,12 @@
             text-transform: uppercase;
         }
 
+        .card-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 0.25rem;
+        }
+
         .card-price {
             font-size: 1.5rem;
             font-weight: 700;
@@ -366,12 +300,6 @@
             font-size: 0.875rem;
             color: #334155;
             margin-top: 0.5rem;
-        }
-
-        .price-label {
-            font-size: 0.875rem;
-            opacity: 0.8;
-            margin-bottom: 0.25rem;
         }
 
         /* --- Breakdown Styles --- */
@@ -437,87 +365,89 @@
 </head>
 
 <body>
-
     <div class="app-container">
         <!-- Left Panel: Controls -->
         <div class="panel-left">
             <h4 class="h4">Cost calculator SUUBER vs Quitt</h4>
 
-            <!-- 1. Net Salary Slider -->
+            <!-- Net Salary -->
             <div class="slider-group">
                 <div class="slider-header">
                     <div class="slider-label">Net salary</div>
                 </div>
                 <div class="slider-wrapper">
-                    <div id="track-bg-salary" class="slider-fill" style="width: 30%"></div>
-                    <div id="bubble-salary" class="slider-bubble" style="left: 30%">30</div>
-                    <input type="range" id="salary-input" min="0" max="100" step="1" value="24">
+                    <div id="track-bg-salary" class="slider-fill"></div>
+                    <div id="bubble-salary" class="slider-bubble">24</div>
+                    <input type="range" id="salary-input" min="0" max="100" step="1" value="24" />
                 </div>
                 <div class="slider-labels"><span>0</span><span>100</span></div>
-                <p class="text-muted p" style="margin-top: 0.5rem;">Net wage received by the cleaning staff</p>
+                <p class="text-muted p" style="margin-top: 0.5rem">
+                    Net wage received by the cleaning staff
+                </p>
             </div>
 
-            <!-- 2. Hours Slider -->
+            <!-- Hours per appointment -->
             <div class="slider-group">
                 <div class="slider-header">
                     <div class="slider-label">Number of hours per appointment</div>
                 </div>
                 <div class="slider-wrapper">
-                    <div id="track-bg-hours" class="slider-fill" style="width: 16.66%"></div>
-                    <div id="bubble-hours" class="slider-bubble" style="left: 16.66%">3</div>
-                    <input type="range" id="hours-input" min="2" max="8" step="0.5" value="3">
+                    <div id="track-bg-hours" class="slider-fill"></div>
+                    <div id="bubble-hours" class="slider-bubble">3</div>
+                    <input type="range" id="hours-input" min="2" max="8" step="0.5" value="3" />
                 </div>
                 <div class="slider-labels"><span>2 Hours</span><span>8 Hours</span></div>
-                <p class="text-muted p" style="margin-top: 0.5rem;">How many hours should the cleaner spend per
-                    appointment?</p>
+                <p class="text-muted p" style="margin-top: 0.5rem">
+                    How many hours should the cleaner spend per appointment?
+                </p>
             </div>
 
-            <!-- 3. Frequency -->
+            <!-- Frequency -->
             <div>
                 <h4 class="h4">How often should it be cleaned?</h4>
                 <div class="radio-group">
                     <label class="radio-label">
-                        <input type="radio" name="frequency" value="monthly" class="custom-radio">
+                        <input type="radio" name="frequency" value="monthly" class="custom-radio" />
                         <div class="radio-circle">
                             <div class="radio-dot"></div>
                         </div>
                         <span class="radio-text">once a month</span>
                     </label>
                     <label class="radio-label">
-                        <input type="radio" name="frequency" value="twice_monthly" class="custom-radio">
+                        <input type="radio" name="frequency" value="twice_monthly" class="custom-radio" />
                         <div class="radio-circle">
                             <div class="radio-dot"></div>
                         </div>
                         <span class="radio-text">twice a month</span>
                     </label>
                     <label class="radio-label">
-                        <input type="radio" name="frequency" value="weekly" class="custom-radio" checked>
+                        <input type="radio" name="frequency" value="weekly" class="custom-radio" checked />
                         <div class="radio-circle">
                             <div class="radio-dot"></div>
                         </div>
                         <span class="radio-text">once a week</span>
                     </label>
                 </div>
-                <p class="text-muted p" style="margin-top: 1rem;">The summary displays the number of appointments per
-                    year.</p>
+                <p class="text-muted p" style="margin-top: 1rem">
+                    The summary displays the number of appointments per year.
+                </p>
             </div>
 
-            <!-- 4. Cancellations Slider -->
+            <!-- Cancellations -->
             <div class="slider-group">
                 <div class="slider-header">
                     <div class="slider-label">Number of appointment cancellations</div>
                 </div>
                 <div class="slider-wrapper">
-                    <div id="track-bg-cancel" class="slider-fill" style="width: 30%"></div>
-                    <div id="bubble-cancel" class="slider-bubble" style="left: 30%">6</div>
-                    <input type="range" id="cancel-input" min="0" max="20" step="1" value="6">
+                    <div id="track-bg-cancel" class="slider-fill"></div>
+                    <div id="bubble-cancel" class="slider-bubble">0</div>
+                    <input type="range" id="cancel-input" min="0" max="20" step="1" value="0" />
                 </div>
                 <div class="slider-labels"><span>0</span><span>20</span></div>
-                <p class="text-muted p" style="margin-top: 0.5rem;">How many appointment cancellations do you plan for
-                    per
-                    year? (Vacations, public holidays, etc.)</p>
+                <p class="text-muted p" style="margin-top: 0.5rem">
+                    How many appointment cancellations do you plan for per year? (Vacations, public holidays, etc.)
+                </p>
             </div>
-
         </div>
 
         <!-- Right Panel: Results -->
@@ -533,15 +463,16 @@
 
                     <div class="breakdown-details">
                         <details>
-                            <summary><i data-lucide="info" style="width:14px; margin-right:6px;"></i> Calculation
-                                Breakdown</summary>
+                            <summary>
+                                <i data-lucide="info" style="width:14px; margin-right:6px;"></i>
+                                Calculation Breakdown
+                            </summary>
                             <div class="breakdown-content" id="quitt-breakdown-content">
-                                <!-- Populated by JS -->
+                                <!-- Filled by JS -->
                             </div>
                         </details>
                     </div>
                 </div>
-
 
                 <!-- SUUBER Card -->
                 <div class="result-card card-suuber">
@@ -549,196 +480,229 @@
                     <div class="card-subtitle">Estimated Monthly Cost</div>
                     <div class="card-price" id="suuber-monthly">CHF 00.00</div>
 
-                    <!-- Added Breakdown -->
+                    <!-- SUUBER Breakdown -->
                     <div class="breakdown-details">
                         <details>
-                            <summary><i data-lucide="info" style="width:14px; margin-right:6px;"></i> Calculation
-                                Breakdown</summary>
+                            <summary>
+                                <i data-lucide="info" style="width:14px; margin-right:6px;"></i>
+                                Calculation Breakdown
+                            </summary>
                             <div class="breakdown-content" id="suuber-breakdown-content">
-                                <!-- Populated by JS -->
+                                <!-- Filled by JS -->
                             </div>
                         </details>
                     </div>
                 </div>
-                <div class="rate-detail">Quitt Total Cost per hour <span id="quitt-hourly-rate">--</span></div>
-                <div class="rate-detail">SUUBER Total Cost per hour <span id="suuber-hourly-rate">--</span></div>
+
+                <div class="rate-detail">
+                    Quitt Total Cost per hour
+                    <span id="quitt-hourly-rate">--</span>
+                </div>
+                <div class="rate-detail">
+                    SUUBER Total Cost per hour
+                    <span id="suuber-hourly-rate">--</span>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- Configuration ---
-        // SUUBER Constants (Percentage markups + Fixed fees)
+        // ---------- CONFIGURATION ----------
+
+        // SUUBER constants (same as you had)
         const S_P_AHV = 10.55;
         const S_P_ALV = 2.20;
-        const S_P_FAK = 2.30; // Using average for calculation
-        const S_ADMIN_PCT = 5.0; // of AHV amount
-        const S_FIXED_PER_HOUR = 0.60 + 0.75 + 0.75 + 1.40; // Flat fees per hour (Accident + KTG + Liability + Service)
+        const S_P_FAK = 2.30;
+        const S_ADMIN_PCT = 5.0; // of AHV part
+        const S_FIXED_PER_HOUR = 0.60 + 0.75 + 0.75 + 1.40; // Accident + KTG + Liability + Service
 
-        // Quitt Constants (Estimated)
-        const Q_P_AHV = 10.55;
-        const Q_P_ALV = 2.20;
-        const Q_P_FAK = 2.30; // Using average for calculation
-        const Q_ADMIN_PCT = 5.0; // of AHV amount
-        const Q_SOCIAL_PCT = 5.0; // of AHV amount
-        const Q_FIXED_PER_HOUR = 0.75; // Estimated fixed fees per hour
-        const Q_EMPLOYER_TAX_PCT = 17.5; // Employer overhead
-        const Q_COMMISSION_PCT = 10.0;   // Platform fee
-        const Q_SUBSCRIPTION_YEARLY = 120.00; // Est. Annual Subscription fee (Assuming 'Starter' or 'Comfort' avg)
+        // Quitt constants based on their calculator & insurance screen
+        // (percentages of gross salary)
+        const Q_EMP_AHV = 5.30;
+        const Q_EMP_UI = 1.10;
 
-        // Annual Visits Mapping
+        const Q_EMPL_AHV = 5.30;
+        const Q_ADMIN = 6.53;
+        const Q_EMPL_UI = 1.10;
+        const Q_FAMILY = 2.03;
+        const Q_OCC_ACC = 1.42;
+        const Q_COMMISSION = 8.0;
+
+        // Zurich insurance + service fee from insurance screen
+        const Q_ZURICH_INS_PCT = 3.073;   // of gross salary
+        const Q_SERVICE_YEARLY = 103.0;   // CHF per calendar year
+
+        // Appointments per year
         const VISITS_PER_YEAR = {
-            'monthly': 12,
-            'twice_monthly': 26,
-            'weekly': 52
+            monthly: 12,
+            twice_monthly: 26,
+            weekly: 52,
         };
 
-        // --- Elements ---
-        const salaryInput = document.getElementById('salary-input');
-        const hoursInput = document.getElementById('hours-input');
-        const cancelInput = document.getElementById('cancel-input');
+        // ---------- ELEMENTS ----------
+        const salaryInput = document.getElementById("salary-input");
+        const hoursInput = document.getElementById("hours-input");
+        const cancelInput = document.getElementById("cancel-input");
 
-        const bubbleSalary = document.getElementById('bubble-salary');
-        const trackSalary = document.getElementById('track-bg-salary');
+        const bubbleSalary = document.getElementById("bubble-salary");
+        const trackSalary = document.getElementById("track-bg-salary");
 
-        const bubbleHours = document.getElementById('bubble-hours');
-        const trackHours = document.getElementById('track-bg-hours');
+        const bubbleHours = document.getElementById("bubble-hours");
+        const trackHours = document.getElementById("track-bg-hours");
 
-        const bubbleCancel = document.getElementById('bubble-cancel');
-        const trackCancel = document.getElementById('track-bg-cancel');
+        const bubbleCancel = document.getElementById("bubble-cancel");
+        const trackCancel = document.getElementById("track-bg-cancel");
 
-        const quittMonthlyEl = document.getElementById('quitt-monthly');
-        const suuberMonthlyEl = document.getElementById('suuber-monthly');
-        const quittRateEl = document.getElementById('quitt-hourly-rate');
-        const suuberRateEl = document.getElementById('suuber-hourly-rate');
+        const quittMonthlyEl = document.getElementById("quitt-monthly");
+        const suuberMonthlyEl = document.getElementById("suuber-monthly");
+        const quittRateEl = document.getElementById("quitt-hourly-rate");
+        const suuberRateEl = document.getElementById("suuber-hourly-rate");
 
-        const suuberBreakdownContent = document.getElementById('suuber-breakdown-content');
-        const quittBreakdownContent = document.getElementById('quitt-breakdown-content');
+        const suuberBreakdownContent = document.getElementById(
+            "suuber-breakdown-content"
+        );
+        const quittBreakdownContent = document.getElementById(
+            "quitt-breakdown-content"
+        );
 
-
-        // --- Logic ---
+        // ---------- CORE CALCULATION ----------
 
         function calculatePrices() {
-            // Inputs (guard against missing elements)
-            const netSalary = salaryInput ? parseFloat(salaryInput.value) || 0 : 0;
-            const hoursPerVisit = hoursInput ? parseFloat(hoursInput.value) || 0 : 0;
-            const cancellations = cancelInput ? parseFloat(cancelInput.value) || 0 : 0;
-            const frequencyInput = document.querySelector('input[name="frequency"]:checked');
-            const frequencyKey = frequencyInput ? frequencyInput.value : 'weekly';
+            const netSalary = parseFloat(salaryInput.value) || 0;
+            const hoursPerVisit = parseFloat(hoursInput.value) || 0;
+            const cancellations = parseFloat(cancelInput.value) || 0;
+            const freqInput = document.querySelector(
+                'input[name="frequency"]:checked'
+            );
+            const frequencyKey = freqInput ? freqInput.value : "weekly";
 
-            // 1. Calculate Total Annual Hours
-            const baseVisits = VISITS_PER_YEAR[frequencyKey] || VISITS_PER_YEAR['weekly'];
-            // Ensure actual visits doesn't drop below 0
+            const fmt = (val) =>
+                new Intl.NumberFormat("de-CH", {
+                    style: "currency",
+                    currency: "CHF",
+                }).format(val);
+
+            // visits & hours per year
+            const baseVisits = VISITS_PER_YEAR[frequencyKey] || VISITS_PER_YEAR.weekly;
             const actualVisits = Math.max(0, baseVisits - cancellations);
-            const totalAnnualHours = actualVisits * hoursPerVisit;
+            const hoursPerYear = hoursPerVisit * actualVisits;
 
-            // Guard against divide by zero if user cancels everything
-            if (totalAnnualHours <= 0) {
-                if (quittMonthlyEl) quittMonthlyEl.textContent = "CHF 0.00";
-                if (suuberMonthlyEl) suuberMonthlyEl.textContent = "CHF 0.00";
-                if (quittRateEl) quittRateEl.textContent = "CHF 0.00";
-                if (suuberRateEl) suuberRateEl.textContent = "CHF 0.00";
-                if (suuberBreakdownContent) suuberBreakdownContent.innerHTML = "";
-                if (quittBreakdownContent) quittBreakdownContent.innerHTML = "";
+            if (!netSalary || !hoursPerVisit || hoursPerYear <= 0) {
+                quittMonthlyEl.textContent = "CHF 0.00";
+                suuberMonthlyEl.textContent = "CHF 0.00";
+                quittRateEl.textContent = "CHF 0.00";
+                suuberRateEl.textContent = "CHF 0.00";
+                suuberBreakdownContent.innerHTML = "";
+                quittBreakdownContent.innerHTML = "";
                 return;
             }
 
+            // ---------- SUUBER ----------
+            const s_Ahv = netSalary * (S_P_AHV / 100);
+            const s_Alv = netSalary * (S_P_ALV / 100);
+            const s_Fak = netSalary * (S_P_FAK / 100);
+            const s_Admin = s_Ahv * (S_ADMIN_PCT / 100);
 
-            // --- SUUBER CALCULATION ---
-            // Hourly Logic: Net + Socials + Admin + Fixed Fees
-            const s_AhvVal = netSalary * (S_P_AHV / 100);
-            const s_AlvVal = netSalary * (S_P_ALV / 100);
-            const s_FakVal = netSalary * (S_P_FAK / 100);
-            const s_AdminVal = s_AhvVal * (S_ADMIN_PCT / 100);
+            const suuberHourly =
+                netSalary + s_Ahv + s_Alv + s_Fak + s_Admin + S_FIXED_PER_HOUR;
 
-            const suuberHourly = netSalary + s_AhvVal + s_AlvVal + s_FakVal + s_AdminVal + S_FIXED_PER_HOUR;
-            // Monthly = (Hourly * AnnualHours) / 12
-            const suuberMonthly = (suuberHourly * totalAnnualHours) / 12;
+            const suuberMonthly = (suuberHourly * hoursPerYear) / 12;
 
-            // --- QUITT CALCULATION ---
-            // Hourly Wage Cost: Net + Employer Taxes + Commission
-            const q_TaxVal = netSalary * (Q_EMPLOYER_TAX_PCT / 100);
-            const q_GrossEst = netSalary + q_TaxVal;
-            const q_CommVal = q_GrossEst * (Q_COMMISSION_PCT / 100);
-            const q_HourlyWageCost = q_GrossEst + q_CommVal;
+            // ---------- QUITT ----------
+            // 1) derive gross from net using employee contributions
+            const empTotalPct = Q_EMP_AHV + Q_EMP_UI;
+            const gross = netSalary / (1 - empTotalPct / 100);
 
-            // Total Annual Cost = (HourlyWage * TotalHours) + FixedSubscription
-            const q_TotalAnnualCost = (q_HourlyWageCost * totalAnnualHours) + Q_SUBSCRIPTION_YEARLY;
-            // Monthly Cost
-            const quittMonthly = q_TotalAnnualCost / 12;
+            // 2) individual employer-side contributions (percent of gross)
+            const q_employerAHV = gross * (Q_EMPL_AHV / 100);
+            const q_admin = gross * (Q_ADMIN / 100);
+            const q_employerUI = gross * (Q_EMPL_UI / 100);
+            const q_family = gross * (Q_FAMILY / 100);
+            const q_occ = gross * (Q_OCC_ACC / 100);
+            const q_commission = gross * (Q_COMMISSION / 100);
 
-            // Effective Hourly Rate (Total Annual / Total Hours)
-            const quittEffectiveHourly = q_TotalAnnualCost / totalAnnualHours;
+            // 3) labour cost per hour (what Quitt salary calculator shows)
+            const quittLabourHourly =
+                netSalary +
+                q_employerAHV +
+                q_admin +
+                q_employerUI +
+                q_family +
+                q_occ +
+                q_commission;
 
-            // --- Update UI ---
-            const fmt = (val) => new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF' }).format(val);
+            // 4) Zurich insurance + service fee
+            const q_zurichPerHour = gross * (Q_ZURICH_INS_PCT / 100);
+            const servicePerHour = Q_SERVICE_YEARLY / hoursPerYear;
 
-            if (suuberMonthlyEl) suuberMonthlyEl.textContent = fmt(suuberMonthly);
-            if (suuberRateEl) suuberRateEl.textContent = fmt(suuberHourly);
+            const quittHourly = quittLabourHourly + q_zurichPerHour + servicePerHour;
 
-            if (quittMonthlyEl) quittMonthlyEl.textContent = fmt(quittMonthly);
-            if (quittRateEl) quittRateEl.textContent = fmt(quittEffectiveHourly);
+            const quittMonthly = (quittHourly * hoursPerYear) / 12;
 
-            if (quittBreakdownContent) {
-                const subscriptionPerHour = Q_SUBSCRIPTION_YEARLY / totalAnnualHours;
+            // ---------- Update UI ----------
 
-                quittBreakdownContent.innerHTML = `
+            suuberMonthlyEl.textContent = fmt(suuberMonthly);
+            suuberRateEl.textContent = fmt(suuberHourly);
+
+            quittMonthlyEl.textContent = fmt(quittMonthly);
+            quittRateEl.textContent = fmt(quittHourly);
+
+            // SUUBER breakdown
+            suuberBreakdownContent.innerHTML = `
         <div class="breakdown-row">
-            <span>Base Net Salary</span>
-            <span>CHF ${netSalary.toFixed(2)}</span>
+          <span>Base Net Salary</span>
+          <span>${fmt(netSalary)}</span>
         </div>
-        <div class="breakdown-subrow">
-            <span>+ Employer taxes (${Q_EMPLOYER_TAX_PCT}%)</span>
-            <span>${q_TaxVal.toFixed(2)}</span>
-        </div>
-        <div class="breakdown-subrow">
-            <span>Subtotal (Net + taxes)</span>
-            <span>${q_GrossEst.toFixed(2)}</span>
-        </div>
-        <div class="breakdown-subrow">
-            <span>+ Platform commission (${Q_COMMISSION_PCT}%)</span>
-            <span>${q_CommVal.toFixed(2)}</span>
-        </div>
+        <div class="breakdown-subrow"><span>+ AHV/IV/EO (${S_P_AHV}%)</span><span>${s_Ahv.toFixed(2)}</span></div>
+        <div class="breakdown-subrow"><span>+ ALV (${S_P_ALV}%)</span><span>${s_Alv.toFixed(2)}</span></div>
+        <div class="breakdown-subrow"><span>+ FAK (~${S_P_FAK}%)</span><span>${s_Fak.toFixed(2)}</span></div>
+        <div class="breakdown-subrow"><span>+ Admin costs (AHV)</span><span>${s_Admin.toFixed(2)}</span></div>
+        <div class="breakdown-divider"></div>
+        <div class="breakdown-subrow"><span>+ Accident insurance</span><span>0.60</span></div>
+        <div class="breakdown-subrow"><span>+ KTG</span><span>0.75</span></div>
+        <div class="breakdown-subrow"><span>+ Liability</span><span>0.75</span></div>
+        <div class="breakdown-subrow"><span>+ Service fee</span><span>1.40</span></div>
         <div class="breakdown-divider"></div>
         <div class="breakdown-row">
-            <span>Hourly wage side</span>
-            <span>${fmt(q_HourlyWageCost)}</span>
+          <span>Total hourly</span>
+          <span>${fmt(suuberHourly)}</span>
         </div>
-        <div class="breakdown-subrow">
-            <span>+ Subscription (per hour)</span>
-            <span>${subscriptionPerHour.toFixed(2)}</span>
+      `;
+
+            // QUITT breakdown
+            quittBreakdownContent.innerHTML = `
+        <div class="breakdown-row">
+          <span>Base Net Salary</span>
+          <span>${fmt(netSalary)}</span>
         </div>
+
+        <div class="breakdown-subrow"><span>+ Employer AHV (${Q_EMPL_AHV}%)</span><span>${q_employerAHV.toFixed(2)}</span></div>
+        <div class="breakdown-subrow"><span>+ Admin costs (${Q_ADMIN}%)</span><span>${q_admin.toFixed(2)}</span></div>
+        <div class="breakdown-subrow"><span>+ Employer UI (${Q_EMPL_UI}%)</span><span>${q_employerUI.toFixed(2)}</span></div>
+        <div class="breakdown-subrow"><span>+ Family equalisation (${Q_FAMILY}%)</span><span>${q_family.toFixed(2)}</span></div>
+        <div class="breakdown-subrow"><span>+ Occupational accident (${Q_OCC_ACC}%)</span><span>${q_occ.toFixed(2)}</span></div>
+        <div class="breakdown-subrow"><span>+ Quitt commission (${Q_COMMISSION}%)</span><span>${q_commission.toFixed(2)}</span></div>
+
         <div class="breakdown-divider"></div>
-        <div class="breakdown-row" style="color:#0f172a">
-            <span>Total effective hourly</span>
-            <span>${fmt(quittEffectiveHourly)}</span>
+        <div class="breakdown-row">
+          <span>Labour cost per hour (Quitt)</span>
+          <span>${fmt(quittLabourHourly)}</span>
         </div>
-    `;
-            }
 
+        <div class="breakdown-divider"></div>
+        <div class="breakdown-subrow"><span>+ Zurich insurance (${Q_ZURICH_INS_PCT}% of gross)</span><span>${q_zurichPerHour.toFixed(2)}</span></div>
+        <div class="breakdown-subrow"><span>+ Service fee (CHF ${Q_SERVICE_YEARLY}/year)</span><span>${servicePerHour.toFixed(2)}</span></div>
 
-            // --- Update Breakdown ---
-            if (suuberBreakdownContent) {
-                suuberBreakdownContent.innerHTML = `
-                    <div class="breakdown-row"><span>Base Net Salary</span> <span>CHF ${netSalary.toFixed(2)}</span></div>
-                    <div class="breakdown-subrow"><span>+ AHV/IV/EO (${S_P_AHV}%)</span> <span>${s_AhvVal.toFixed(2)}</span></div>
-                    <div class="breakdown-subrow"><span>+ ALV (${S_P_ALV}%)</span> <span>${s_AlvVal.toFixed(2)}</span></div>
-                    <div class="breakdown-subrow"><span>+ FAK (~2.3%)</span> <span>${s_FakVal.toFixed(2)}</span></div>
-                    <div class="breakdown-subrow"><span>+ Administrative costs AHV</span> <span>${s_AdminVal.toFixed(2)}</span></div>
-                    <div class="breakdown-divider"></div>
-                    <div class="breakdown-subrow"><span>+ Accident insurance</span> <span>0.60</span></div>
-                    <div class="breakdown-subrow"><span>+ KTG</span> <span>0.75</span></div>
-                    <div class="breakdown-subrow"><span>+ Liability</span> <span>0.75</span></div>
-                    <div class="breakdown-subrow"><span>+ Service fee</span> <span>1.40</span></div>
-                    <div class="breakdown-divider"></div>
-                    <div class="breakdown-row" style="color:#0f172a"><span>Total Hourly</span> <span>${fmt(suuberHourly)}</span></div>
-                `;
-            }
+        <div class="breakdown-divider"></div>
+        <div class="breakdown-row">
+          <span>Total hourly incl. insurance</span>
+          <span>${fmt(quittHourly)}</span>
+        </div>
+      `;
         }
 
-        // --- Slider Visuals ---
+        // ---------- SLIDER VISUALS ----------
         function updateSlider(input, bubble, track) {
-            if (!input || !bubble || !track) return;
             const min = parseFloat(input.min);
             const max = parseFloat(input.max);
             const val = parseFloat(input.value);
@@ -749,90 +713,34 @@
             bubble.textContent = val;
         }
 
-        // --- Gemini AI ---z
-        async function generatePlan() {
-            // Read inputs (guard if elements are missing)
-            const hours = hoursInput ? hoursInput.value : '0';
-            const frequencyInput = document.querySelector('input[name="frequency"]:checked');
-            const frequency = frequencyInput ? (frequencyInput.parentElement.querySelector('.radio-text')?.innerText || 'unknown') : 'unknown';
-
-            // Optional DOM elements for the Gemini UI; function should be no-op if they're not present
-            const resultDiv = document.getElementById('gemini-result');
-            const contentDiv = document.getElementById('gemini-content');
-            const loadingDiv = document.getElementById('gemini-loading');
-
-            if (!resultDiv || !contentDiv || !loadingDiv) {
-                // Elements not present in this markup — skip generation silently
-                console.warn('generatePlan skipped: gemini UI elements not found.');
-                return;
-            }
-
-            resultDiv.classList.add('hidden');
-            loadingDiv.classList.remove('hidden');
-
-            const apiKey = ""; // set your API key here if you intend to use the API
-            if (!apiKey) {
-                console.warn('generatePlan skipped: API key is empty.');
-                loadingDiv.classList.add('hidden');
-                resultDiv.classList.remove('hidden');
-                contentDiv.innerHTML = '<p style="opacity:0.8">AI generation disabled (no API key).</p>';
-                return;
-            }
-
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            const prompt = `You are a cleaning expert. User booked ${hours}h, frequency "${frequency}". Generate a cleaning checklist. Format Markdown. Concise.`;
-
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-                });
-
-                if (!response.ok) {
-                    // Network or API-level error
-                    throw new Error(`Network error: ${response.status}`);
-                }
-
-                const data = await response.json();
-
-                // Safely navigate expected response shape
-                const text = data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text
-                    ? data.candidates[0].content.parts[0].text
-                    : null;
-
-                if (!text) {
-                    throw new Error('Unexpected API response format.');
-                }
-
-                contentDiv.innerHTML = marked.parse(text);
-                loadingDiv.classList.add('hidden');
-                resultDiv.classList.remove('hidden');
-            } catch (error) {
-                console.error(error);
-                loadingDiv.classList.add('hidden');
-                resultDiv.classList.remove('hidden');
-                contentDiv.innerHTML = '<p style="color:#b91c1c">Unable to generate AI plan at this time.</p>';
-            }
-        }
         // Listeners
-        if (salaryInput) salaryInput.addEventListener('input', () => { updateSlider(salaryInput, bubbleSalary, trackSalary); calculatePrices(); });
-        if (hoursInput) hoursInput.addEventListener('input', () => { updateSlider(hoursInput, bubbleHours, trackHours); calculatePrices(); });
-        if (cancelInput) cancelInput.addEventListener('input', () => { updateSlider(cancelInput, bubbleCancel, trackCancel); calculatePrices(); });
-
-        document.querySelectorAll('input[name="frequency"]').forEach(r => {
-            r.addEventListener('change', () => { calculatePrices(); });
+        salaryInput.addEventListener("input", () => {
+            updateSlider(salaryInput, bubbleSalary, trackSalary);
+            calculatePrices();
+        });
+        hoursInput.addEventListener("input", () => {
+            updateSlider(hoursInput, bubbleHours, trackHours);
+            calculatePrices();
+        });
+        cancelInput.addEventListener("input", () => {
+            updateSlider(cancelInput, bubbleCancel, trackCancel);
+            calculatePrices();
         });
 
+        document
+            .querySelectorAll('input[name="frequency"]')
+            .forEach((r) => r.addEventListener("change", calculatePrices));
+
         // Init
-        if (salaryInput && bubbleSalary && trackSalary) updateSlider(salaryInput, bubbleSalary, trackSalary);
-        if (hoursInput && bubbleHours && trackHours) updateSlider(hoursInput, bubbleHours, trackHours);
-        if (cancelInput && bubbleCancel && trackCancel) updateSlider(cancelInput, bubbleCancel, trackCancel);
+        updateSlider(salaryInput, bubbleSalary, trackSalary);
+        updateSlider(hoursInput, bubbleHours, trackHours);
+        updateSlider(cancelInput, bubbleCancel, trackCancel);
 
-        // Initial Icons
-        if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+        if (typeof lucide !== "undefined" && lucide.createIcons) {
+            lucide.createIcons();
+        }
+
         calculatePrices();
-
     </script>
 </body>
 
