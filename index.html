@@ -513,7 +513,8 @@
                     <input type="range" id="cancel-input" min="0" max="20" step="1" value="6">
                 </div>
                 <div class="slider-labels"><span>0</span><span>20</span></div>
-                <p class="text-muted p" style="margin-top: 0.5rem;">How many appointment cancellations do you plan for per
+                <p class="text-muted p" style="margin-top: 0.5rem;">How many appointment cancellations do you plan for
+                    per
                     year? (Vacations, public holidays, etc.)</p>
             </div>
 
@@ -529,7 +530,18 @@
                     <div class="card-title">Quitt</div>
                     <div class="card-subtitle">Estimated Monthly Cost</div>
                     <div class="card-price" id="quitt-monthly">CHF 00.00</div>
+
+                    <div class="breakdown-details">
+                        <details>
+                            <summary><i data-lucide="info" style="width:14px; margin-right:6px;"></i> Calculation
+                                Breakdown</summary>
+                            <div class="breakdown-content" id="quitt-breakdown-content">
+                                <!-- Populated by JS -->
+                            </div>
+                        </details>
+                    </div>
                 </div>
+
 
                 <!-- SUUBER Card -->
                 <div class="result-card card-suuber">
@@ -601,6 +613,8 @@
         const suuberRateEl = document.getElementById('suuber-hourly-rate');
 
         const suuberBreakdownContent = document.getElementById('suuber-breakdown-content');
+        const quittBreakdownContent = document.getElementById('quitt-breakdown-content');
+
 
         // --- Logic ---
 
@@ -625,8 +639,10 @@
                 if (quittRateEl) quittRateEl.textContent = "CHF 0.00";
                 if (suuberRateEl) suuberRateEl.textContent = "CHF 0.00";
                 if (suuberBreakdownContent) suuberBreakdownContent.innerHTML = "";
+                if (quittBreakdownContent) quittBreakdownContent.innerHTML = "";
                 return;
             }
+
 
             // --- SUUBER CALCULATION ---
             // Hourly Logic: Net + Socials + Admin + Fixed Fees
@@ -663,6 +679,44 @@
             if (quittMonthlyEl) quittMonthlyEl.textContent = fmt(quittMonthly);
             if (quittRateEl) quittRateEl.textContent = fmt(quittEffectiveHourly);
 
+            if (quittBreakdownContent) {
+                const subscriptionPerHour = Q_SUBSCRIPTION_YEARLY / totalAnnualHours;
+
+                quittBreakdownContent.innerHTML = `
+        <div class="breakdown-row">
+            <span>Base Net Salary</span>
+            <span>CHF ${netSalary.toFixed(2)}</span>
+        </div>
+        <div class="breakdown-subrow">
+            <span>+ Employer taxes (${Q_EMPLOYER_TAX_PCT}%)</span>
+            <span>${q_TaxVal.toFixed(2)}</span>
+        </div>
+        <div class="breakdown-subrow">
+            <span>Subtotal (Net + taxes)</span>
+            <span>${q_GrossEst.toFixed(2)}</span>
+        </div>
+        <div class="breakdown-subrow">
+            <span>+ Platform commission (${Q_COMMISSION_PCT}%)</span>
+            <span>${q_CommVal.toFixed(2)}</span>
+        </div>
+        <div class="breakdown-divider"></div>
+        <div class="breakdown-row">
+            <span>Hourly wage side</span>
+            <span>${fmt(q_HourlyWageCost)}</span>
+        </div>
+        <div class="breakdown-subrow">
+            <span>+ Subscription (per hour)</span>
+            <span>${subscriptionPerHour.toFixed(2)}</span>
+        </div>
+        <div class="breakdown-divider"></div>
+        <div class="breakdown-row" style="color:#0f172a">
+            <span>Total effective hourly</span>
+            <span>${fmt(quittEffectiveHourly)}</span>
+        </div>
+    `;
+            }
+
+
             // --- Update Breakdown ---
             if (suuberBreakdownContent) {
                 suuberBreakdownContent.innerHTML = `
@@ -695,7 +749,7 @@
             bubble.textContent = val;
         }
 
-        // --- Gemini AI ---
+        // --- Gemini AI ---z
         async function generatePlan() {
             // Read inputs (guard if elements are missing)
             const hours = hoursInput ? hoursInput.value : '0';
