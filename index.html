@@ -505,32 +505,30 @@
             </div>
         </div>
     </div>
-
     <script>
         // ---------- CONFIGURATION ----------
 
-        // SUUBER constants (same as you had)
-        const S_P_AHV = 10.55;
-        const S_P_ALV = 2.20;
-        const S_P_FAK = 2.30;
-        const S_ADMIN_PCT = 5.0; // of AHV part
-        const S_FIXED_PER_HOUR = 0.60 + 0.75 + 0.75 + 1.40; // Accident + KTG + Liability + Service
-
-        // Quitt constants based on their calculator & insurance screen
-        // (percentages of gross salary)
+        // Cleaner contributions (percent of gross salary)
         const Q_EMP_AHV = 5.30;
-        const Q_EMP_UI = 1.10;
+        const Q_EMP_ALV = 1.10;
 
+        // Employer contributions (percent of gross salary) – Quitt
         const Q_EMPL_AHV = 5.30;
-        const Q_ADMIN = 6.53;
-        const Q_EMPL_UI = 1.10;
-        const Q_FAMILY = 2.03;
-        const Q_OCC_ACC = 1.42;
-        const Q_COMMISSION = 8.0;
+        const Q_EMPL_ALV = 1.10;
+        const Q_ADMIN = 0.53;      // Verwaltungskosten SVA
+        const Q_FAMILY = 1.03;     // Familienausgleichskasse (Quitt)
+        const Q_OCC_ACC = 0.42;    // Unfallversicherung
+        const Q_COMMISSION = 8.0;  // Quitt commission
 
-        // Zurich insurance + service fee from insurance screen
-        const Q_ZURICH_INS_PCT = 3.073;   // of gross salary
-        const Q_SERVICE_YEARLY = 103.0;   // CHF per calendar year
+        // KTG + liability + fixed fee for Quitt
+        const Q_KTG_HAFTPFLICHT_PCT = 3.073; // KTG & Haftpflicht (Zurich) – % of gross
+        const Q_SERVICE_YEARLY = 103.0;      // Fixkosten per calendar year (CHF)
+
+        // SUUBER-specific employer contributions
+        const S_FAMILY = 1.05;                       // Familienausgleichskasse (Suuber) – % of gross
+        const S_UNFALL_PER_HOUR = 0.60;             // Unfall – CHF/hour
+        const S_COMMISSION_PER_HOUR = 1.40;         // Suuber commission – CHF/hour
+        const S_KTG_HAFTPFLICHT_PER_HOUR = 1.50;    // KTG & Haftpflicht – CHF/hour
 
         // Appointments per year
         const VISITS_PER_YEAR = {
@@ -583,7 +581,8 @@
                 }).format(val);
 
             // visits & hours per year
-            const baseVisits = VISITS_PER_YEAR[frequencyKey] || VISITS_PER_YEAR.weekly;
+            const baseVisits =
+                VISITS_PER_YEAR[frequencyKey] || VISITS_PER_YEAR.weekly;
             const actualVisits = Math.max(0, baseVisits - cancellations);
             const hoursPerYear = hoursPerVisit * actualVisits;
 
@@ -597,45 +596,74 @@
                 return;
             }
 
+            // ---------- COMMON: derive gross from net ----------
+            // Net = Gross * (1 - (employee AHV + ALV))
+            const empTotalPct = Q_EMP_AHV + Q_EMP_ALV;
+            const gross = netSalary / (1 - empTotalPct / 100);
+            const fromGross = (pct) => gross * (pct / 100);
+
+            // Cleaner-side contributions (same for both Quitt & SUUBER)
+            const cleanerAHV = fromGross(Q_EMP_AHV);
+            const cleanerALV = fromGross(Q_EMP_ALV);
+
             // ---------- SUUBER ----------
-            const s_Ahv = netSalary * (S_P_AHV / 100);
-            const s_Alv = netSalary * (S_P_ALV / 100);
-            const s_Fak = netSalary * (S_P_FAK / 100);
-            const s_Admin = s_Ahv * (S_ADMIN_PCT / 100);
+            const s_employerAHV = fromGross(Q_EMPL_AHV);
+            const s_employerALV = fromGross(Q_EMPL_ALV);
+            const s_admin = fromGross(Q_ADMIN);      // Verwaltungskosten SVA
+            const s_family = fromGross(S_FAMILY);    // Familienausgleichskasse
+
+            const s_unfall = S_UNFALL_PER_HOUR;
+            const s_commission = S_COMMISSION_PER_HOUR;
+            const s_ktgHaft = S_KTG_HAFTPFLICHT_PER_HOUR;
 
             const suuberHourly =
-                netSalary + s_Ahv + s_Alv + s_Fak + s_Admin + S_FIXED_PER_HOUR;
+                netSalary +
+                cleanerAHV +
+                cleanerALV +
+                s_employerAHV +
+                s_employerALV +
+                s_admin +
+                s_family +
+                s_unfall +
+                s_commission +
+                s_ktgHaft;
 
             const suuberMonthly = (suuberHourly * hoursPerYear) / 12;
 
             // ---------- QUITT ----------
-            // 1) derive gross from net using employee contributions
-            const empTotalPct = Q_EMP_AHV + Q_EMP_UI;
-            const gross = netSalary / (1 - empTotalPct / 100);
+            // Employer-side contributions
+            const q_employerAHV = fromGross(Q_EMPL_AHV);
+            const q_employerALV = fromGross(Q_EMPL_ALV);
+            const q_admin = fromGross(Q_ADMIN);
+            const q_family = fromGross(Q_FAMILY);
+            const q_occ = fromGross(Q_OCC_ACC);
+            const q_commission = fromGross(Q_COMMISSION);
 
-            // 2) individual employer-side contributions (percent of gross)
-            const q_employerAHV = gross * (Q_EMPL_AHV / 100);
-            const q_admin = gross * (Q_ADMIN / 100);
-            const q_employerUI = gross * (Q_EMPL_UI / 100);
-            const q_family = gross * (Q_FAMILY / 100);
-            const q_occ = gross * (Q_OCC_ACC / 100);
-            const q_commission = gross * (Q_COMMISSION / 100);
+            // Cleaner-side (already for both above)
+            const q_cleanerAHV = cleanerAHV;
+            const q_cleanerALV = cleanerALV;
 
-            // 3) labour cost per hour (what Quitt salary calculator shows)
+            // Labour cost per hour (net + employer contributions only)
             const quittLabourHourly =
                 netSalary +
                 q_employerAHV +
+                q_employerALV +
                 q_admin +
-                q_employerUI +
                 q_family +
                 q_occ +
                 q_commission;
 
-            // 4) Zurich insurance + service fee
-            const q_zurichPerHour = gross * (Q_ZURICH_INS_PCT / 100);
+            // KTG + Haftpflicht (Zurich) and yearly fix cost
+            const q_ktgPerHour = fromGross(Q_KTG_HAFTPFLICHT_PCT);
             const servicePerHour = Q_SERVICE_YEARLY / hoursPerYear;
 
-            const quittHourly = quittLabourHourly + q_zurichPerHour + servicePerHour;
+            // Total hourly incl. cleaner contributions + insurance + fix cost
+            const quittHourly =
+                quittLabourHourly +
+                q_cleanerAHV +
+                q_cleanerALV +
+                q_ktgPerHour +
+                servicePerHour;
 
             const quittMonthly = (quittHourly * hoursPerYear) / 12;
 
@@ -649,56 +677,109 @@
 
             // SUUBER breakdown
             suuberBreakdownContent.innerHTML = `
-        <div class="breakdown-row">
-          <span>Base Net Salary</span>
-          <span>${fmt(netSalary)}</span>
-        </div>
-        <div class="breakdown-subrow"><span>+ AHV/IV/EO (${S_P_AHV}%)</span><span>${s_Ahv.toFixed(2)}</span></div>
-        <div class="breakdown-subrow"><span>+ ALV (${S_P_ALV}%)</span><span>${s_Alv.toFixed(2)}</span></div>
-        <div class="breakdown-subrow"><span>+ FAK (~${S_P_FAK}%)</span><span>${s_Fak.toFixed(2)}</span></div>
-        <div class="breakdown-subrow"><span>+ Admin costs (AHV)</span><span>${s_Admin.toFixed(2)}</span></div>
-        <div class="breakdown-divider"></div>
-        <div class="breakdown-subrow"><span>+ Accident insurance</span><span>0.60</span></div>
-        <div class="breakdown-subrow"><span>+ KTG</span><span>0.75</span></div>
-        <div class="breakdown-subrow"><span>+ Liability</span><span>0.75</span></div>
-        <div class="breakdown-subrow"><span>+ Service fee</span><span>1.40</span></div>
-        <div class="breakdown-divider"></div>
-        <div class="breakdown-row">
-          <span>Total hourly</span>
-          <span>${fmt(suuberHourly)}</span>
-        </div>
-      `;
+      <div class="breakdown-row">
+        <span>Cleaner contribution</span>
+      </div>
+      <div class="breakdown-subrow"><span>AHV (${Q_EMP_AHV}%)</span><span>${cleanerAHV.toFixed(
+                2
+            )}</span></div>
+      <div class="breakdown-subrow"><span>ALV (${Q_EMP_ALV}%)</span><span>${cleanerALV.toFixed(
+                2
+            )}</span></div>
+
+      <div class="breakdown-divider"></div>
+      <div class="breakdown-row">
+        <span>Employer contribution</span>
+      </div>
+
+      <div class="breakdown-subrow"><span>AHV (${Q_EMPL_AHV}%)</span><span>${s_employerAHV.toFixed(
+                2
+            )}</span></div>
+      <div class="breakdown-subrow"><span>ALV (${Q_EMPL_ALV}%)</span><span>${s_employerALV.toFixed(
+                2
+            )}</span></div>
+      <div class="breakdown-subrow"><span>Verwaltungskosten SVA (${Q_ADMIN}%)</span><span>${s_admin.toFixed(
+                2
+            )}</span></div>
+      <div class="breakdown-subrow"><span>Familienausgleichskasse (${S_FAMILY}%)</span><span>${s_family.toFixed(
+                2
+            )}</span></div>
+      <div class="breakdown-subrow"><span>Unfall (fix)</span><span>${s_unfall.toFixed(
+                2
+            )}</span></div>
+      <div class="breakdown-subrow"><span>SUUBER Kommission (fix)</span><span>${s_commission.toFixed(
+                2
+            )}</span></div>
+      <div class="breakdown-subrow"><span>KTG und Haftpflicht (fix)</span><span>${s_ktgHaft.toFixed(
+                2
+            )}</span></div>
+
+      <div class="breakdown-divider"></div>
+      <div class="breakdown-row">
+        <span>Total hourly</span>
+        <span>${fmt(suuberHourly)}</span>
+      </div>
+    `;
 
             // QUITT breakdown
             quittBreakdownContent.innerHTML = `
-        <div class="breakdown-row">
-          <span>Base Net Salary</span>
-          <span>${fmt(netSalary)}</span>
-        </div>
+      <div class="breakdown-row">
+        <span>Employer contributions</span>
+      </div>
 
-        <div class="breakdown-subrow"><span>+ Employer AHV (${Q_EMPL_AHV}%)</span><span>${q_employerAHV.toFixed(2)}</span></div>
-        <div class="breakdown-subrow"><span>+ Admin costs (${Q_ADMIN}%)</span><span>${q_admin.toFixed(2)}</span></div>
-        <div class="breakdown-subrow"><span>+ Employer UI (${Q_EMPL_UI}%)</span><span>${q_employerUI.toFixed(2)}</span></div>
-        <div class="breakdown-subrow"><span>+ Family equalisation (${Q_FAMILY}%)</span><span>${q_family.toFixed(2)}</span></div>
-        <div class="breakdown-subrow"><span>+ Occupational accident (${Q_OCC_ACC}%)</span><span>${q_occ.toFixed(2)}</span></div>
-        <div class="breakdown-subrow"><span>+ Quitt commission (${Q_COMMISSION}%)</span><span>${q_commission.toFixed(2)}</span></div>
+      <div class="breakdown-divider"></div>
 
-        <div class="breakdown-divider"></div>
-        <div class="breakdown-row">
-          <span>Labour cost per hour (Quitt)</span>
-          <span>${fmt(quittLabourHourly)}</span>
-        </div>
+      <div class="breakdown-subrow"><span>AHV (${Q_EMPL_AHV}%)</span><span>${q_employerAHV.toFixed(
+                2
+            )}</span></div>
+      <div class="breakdown-subrow"><span>ALV (${Q_EMPL_ALV}%)</span><span>${q_employerALV.toFixed(
+                2
+            )}</span></div>
+      <div class="breakdown-subrow"><span>Verwaltungskosten SVA (${Q_ADMIN}%)</span><span>${q_admin.toFixed(
+                2
+            )}</span></div>
+      <div class="breakdown-subrow"><span>Familienausgleichskasse (${Q_FAMILY}%)</span><span>${q_family.toFixed(
+                2
+            )}</span></div>
+      <div class="breakdown-subrow"><span>Unfall (${Q_OCC_ACC}%)</span><span>${q_occ.toFixed(
+                2
+            )}</span></div>
+      <div class="breakdown-subrow"><span>Quitt Kommission (${Q_COMMISSION}%)</span><span>${q_commission.toFixed(
+                2
+            )}</span></div>
 
-        <div class="breakdown-divider"></div>
-        <div class="breakdown-subrow"><span>+ Zurich insurance (${Q_ZURICH_INS_PCT}% of gross)</span><span>${q_zurichPerHour.toFixed(2)}</span></div>
-        <div class="breakdown-subrow"><span>+ Service fee (CHF ${Q_SERVICE_YEARLY}/year)</span><span>${servicePerHour.toFixed(2)}</span></div>
+      <div class="breakdown-divider"></div>
+      <div class="breakdown-row">
+        <span>Cleaner contribution</span>
+      </div>
 
-        <div class="breakdown-divider"></div>
-        <div class="breakdown-row">
-          <span>Total hourly incl. insurance</span>
-          <span>${fmt(quittHourly)}</span>
-        </div>
-      `;
+      <div class="breakdown-subrow"><span>AHV (${Q_EMP_AHV}%)</span><span>${q_cleanerAHV.toFixed(
+                2
+            )}</span></div>
+      <div class="breakdown-subrow"><span>ALV (${Q_EMP_ALV}%)</span><span>${q_cleanerALV.toFixed(
+                2
+            )}</span></div>
+
+      <div class="breakdown-divider"></div>
+      <div class="breakdown-row">
+        <span>Labour cost per hour (Quitt)</span>
+        <span>${fmt(quittLabourHourly)}</span>
+      </div>
+
+      <div class="breakdown-divider"></div>
+      <div class="breakdown-subrow"><span>KTG und Haftpflicht (${Q_KTG_HAFTPFLICHT_PCT}% von Bruttolohn)</span><span>${q_ktgPerHour.toFixed(
+                2
+            )}</span></div>
+      <div class="breakdown-subrow"><span>Fixkosten (CHF ${Q_SERVICE_YEARLY}/Jahr)</span><span>${servicePerHour.toFixed(
+                2
+            )}</span></div>
+
+      <div class="breakdown-divider"></div>
+      <div class="breakdown-row">
+        <span>Total hourly inkl. Versicherung & Fixkosten</span>
+        <span>${fmt(quittHourly)}</span>
+      </div>
+    `;
         }
 
         // ---------- SLIDER VISUALS ----------
@@ -742,6 +823,7 @@
 
         calculatePrices();
     </script>
+
 </body>
 
 </html>
